@@ -24,7 +24,8 @@ class StatusRequest extends FormRequest
     public function rules()
     {
         return [
-            "status"=>'required|boolean'
+            "status"=>'required|boolean',
+            'pin'=>'string'
         ];
     }
 }

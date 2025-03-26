@@ -5,8 +5,8 @@ use App\Services\OwnService;
 
 class UserService extends OwnService
 {
-    public function __construct(UserRepository $atributi)
+    public function __construct(public UserRepository $atributi)
     {
         parent::__construct($atributi);
-    }   
+    }
 }

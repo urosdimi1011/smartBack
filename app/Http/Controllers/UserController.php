@@ -13,8 +13,7 @@ class UserController extends Controller
 
     public function __construct(
         protected UserService $userService
-      ) {
-      }
+    ) {}
 
     public function index()
     {
@@ -28,19 +27,24 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
-        try{
+        try {
             $data = $request->validated();
             $data['password'] = Hash::make($data['password']);
 
+            $exists = $this->userService->filterByColumns(['email' => $request->input('email')], '=');
 
-            $this->userService->create($data);
-            return response()->json(["message"=>"Uspesno ste se registrovali"],201);
+            if (count($exists)) {
+                return response()->json(["message" => "Email vec postoji"], 500);
+            }
+            $user = $this->userService->create($data);
 
+            $user->sendEmailVerificationNotification();
+
+
+            return response()->json(["message" => "Uspesno ste se registrovali"], 201);
+        } catch (Exception $ex) {
+            return response()->json(["message" => $ex->getMessage()], 500);
         }
-        catch(Exception $ex){
-            return response()->json(["message"=>$ex->getMessage()],500);
-        }
-
     }
 
 

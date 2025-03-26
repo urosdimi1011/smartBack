@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GroupRequest;
 use App\Services\GroupService;
+use App\Traits\DeviceStautsTrait;
 use Error;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
+    use DeviceStautsTrait;
     public function __construct(
         protected GroupService $groupService,
     ) {}
@@ -25,9 +27,12 @@ class GroupController extends Controller
             }
             else{
                 $groupsWithDevices = $this->groupService->filterByColumnsAndRelation(["id_user" => auth()->user()->id], "=", 'devices.category');
+                foreach ($groupsWithDevices as $g){
+                    $g->devices = $this->checkDeviceStatus($g->devices);
+                }
             }
             // $allDevice = $this->groupService->filterByColumns(["id_user"=>auth()->user()->id]);
-            return response()->json(["groups" => $groupsWithDevices], 200);
+            return response()->json(["groups" => $groupsWithDevices]);
         } catch (Error $ex) {
             $statusCode = ($ex->getCode() >= 100 && $ex->getCode() <= 599) ? $ex->getCode() : 500;
             return response()->json(["message" => $ex->getMessage()], $statusCode);

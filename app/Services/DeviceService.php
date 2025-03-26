@@ -12,14 +12,19 @@ class DeviceService extends OwnService
         parent::__construct($atributi);
     }
 
-    public function changeStatus($id, $status)
+    public function changeStatus($id, $status,$pin="")
     {
-        $device = $this->getById($id);
+        if(strlen((string)$id) == 5){
+            $device=$this->filterByColumns(['board'=>$id,'pin'=>$pin])->first();
+        }
+        else{
+            $device = $this->getById($id);
+        }
         return $this->atributi->changeStatusOfDevice($device, $status);
     }
     public function filterByColumns($filters, $operator = "=")
     {
-        return $this->atributi->filterByColumns($filters, $operator)->get();
+        return $this->atributi->filterByColumns($filters, $operator);
     }
 
     public function filterByColumnsAndRelation($filters, $operator = "=",$relation)
@@ -27,8 +32,8 @@ class DeviceService extends OwnService
         // dd($filters,$operator,$relation);
         return $this->atributi->filterByColumnsAndRelation($filters, $operator,$relation);
     }
-    public function updateColumnForCall($id,$column)
+    public function updateColumnForCall($id,array $columns)
     {
-        return $this->update($id,$column);
+        return $this->update($id,$columns);
     }
 }

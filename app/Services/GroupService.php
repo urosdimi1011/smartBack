@@ -9,7 +9,7 @@ class GroupService extends OwnService
     public function __construct(public GroupRepository $atributi)
     {
         parent::__construct($atributi);
-    }   
+    }
     public function filterByColumns($filters, $operator = "=")
     {
         return $this->atributi->filterByColumns($filters, $operator)->get();
@@ -17,7 +17,6 @@ class GroupService extends OwnService
 
     public function filterByColumnsAndRelation($filters, $operator = "=",$relation,$relationFilters=[])
     {
-        // dd($filters,$operator,$relation);
         return $this->atributi->filterByColumnsAndRelation($filters, $operator,$relation,$relationFilters);
     }
     public function changeStatusOfDeviceInGroup($id,$status){

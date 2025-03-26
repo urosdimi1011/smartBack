@@ -6,8 +6,10 @@ use App\Models\User;
 // use Illuminate\Database\Eloquent\Model;
 class UserRepository implements RepositoryInterface
 {
-    protected $model;
-
+    public $model;
+    public function sendEmailVerificationNotification(){
+        $this->model->sendEmailVerificationNotification();
+    }
     public function __construct(User $model)
     {
         $this->model = $model;
@@ -74,7 +76,7 @@ class UserRepository implements RepositoryInterface
                     $query->orWhere($column, $operator, $value);
                 }
             }
-        });
+        })->get();
     }
 
     // public function filterByColumns($filters, $operator)

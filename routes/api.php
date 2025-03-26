@@ -6,6 +6,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TimerController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,11 +24,17 @@ use Illuminate\Support\Facades\Route;
     Route::post('login', [AuthController::class, 'login']);
     Route::post('refresh', [AuthController::class, 'refreshToken']);
     Route::get('categories', [CategoryController::class, 'getAll']);
+    Route::get('timerChange', [TimerController::class, 'processTimers']);
+    Route::get('device/{id}', [DeviceController::class, 'getStatusOfDevice']);
+    Route::get('device/status/{id}', [DeviceController::class, 'changeStatusOfDevice']);
+    Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+            ->name('verification.verify');
 
-    Route::middleware('auth:api')->group(function(){
+    Route::post('/email/resend', [VerificationController::class, 'resend']);
+    // /api/device/status/53?status=1
+    Route::middleware(['auth:api','verified'])->group(function(){
         Route::post('device', [DeviceController::class, 'store']);
         Route::get('device', [DeviceController::class, 'getAll']);
-        Route::patch('device/status/{id}', [DeviceController::class, 'changeStatusOfDevice']);
         Route::get('groups', [GroupController::class, 'getAll']);
         Route::post('groups/{id}', [GroupController::class, 'addDeviceInGroup']);
         Route::delete('groups/{id}', [GroupController::class, 'removeGroup']);
@@ -37,9 +44,7 @@ use Illuminate\Support\Facades\Route;
         Route::post('timer', [TimerController::class, 'setTimer']);
         Route::get('timer', [TimerController::class, 'getAll']);
         Route::patch('device/group/{id}', [DeviceController::class, 'changeStatusOfDeviceInGroup']);
-        Route::get('device/{id}', [DeviceController::class, 'getStatusOfDevice']);
         Route::patch('device/name/{id}', [DeviceController::class, 'changeNameOfDevice']);
-        Route::patch('timer', [TimerController::class, 'processTimers']);
         Route::delete('timer/{id}', [TimerController::class, 'deleteTimer']);
         Route::put('timer/{id}', [TimerController::class, 'changeTimer']);
         Route::delete('device/{id}', [DeviceController::class, 'removeDevice']);

@@ -19,16 +19,10 @@ class DeviceMail extends Mailable
         $this->device = $device;
     }
 
-    /**
-     * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
-     */
     public function envelope()
     {
         return new Envelope(
             subject: 'Informacije o uredjaju',
-
         );
     }
 
@@ -40,11 +34,6 @@ class DeviceMail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array
-     */
     public function attachments()
     {
         return [];

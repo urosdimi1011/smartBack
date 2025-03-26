@@ -1,18 +1,14 @@
 <?php
 
 namespace App\Models;
-
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-// use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-
-// use Illuminate\Notifications\Notifiable;
-// use Laravel\Sanctum\HasApiTokens;
-// use Laravel\Sanctum\HasApiTokens; 
-
-class User extends Authenticatable implements JWTSubject
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
+    use Notifiable;
     // use HasApiTokens, Notifiable;
     const CREATED_AT = 'create_date';
     const UPDATED_AT = 'update_date';
@@ -35,5 +31,9 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomVerifyEmail);
     }
 }

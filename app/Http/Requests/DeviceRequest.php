@@ -29,8 +29,10 @@ class DeviceRequest extends FormRequest
             'idGrupe' => 'nullable',
             'name' => 'required',
             'ssid' => 'required',
-            'wifiPassword' => 'required'
-        ];;
+            'wifiPassword' => 'required',
+            'board'=>'nullable|numeric',
+            'pin'=>'nullable|numeric'
+        ];
     }
     protected function failedValidation(Validator $validator){
         throw new HttpResponseException(response()->json([

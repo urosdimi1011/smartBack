@@ -14,11 +14,12 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
+    protected $commands = [
+        \App\Console\Commands\callTimer::class,
+    ];
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            Http::patch('http://127.0.0.1:8000/api/timer');
-        })->everyMinute();
+        $schedule->command('timer:process')->everyMinute();
     }
 
     /**

@@ -19,7 +19,8 @@ class Device extends Model
         'id_user',
         'pin',
         'board',
-        'updated_date'
+        'updated_date',
+        'last_ip_address'
     ];
 
     protected $hidden = [

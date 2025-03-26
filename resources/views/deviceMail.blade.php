@@ -11,10 +11,12 @@
     <div class="container">
         <h1>Informacije o dodatom uredjaju</h1>
 
-        <p><strong>Id uredjaja</strong> {{ $device['id'] }}</p>
-        <p><strong>Ime uredjaja</strong> {{ $device['name'] }}</p>
-        <p><strong></strong> {{ $device['email'] }}</p>
-
+        <p><strong>Id uredjaja:</strong> {{ $device['id'] }}</p>
+        <p><strong>Ime uredjaja:</strong> {{ $device['name'] }}</p>
+        <p><strong>Kreirano:</strong> {{ $device['created_date'] }}</p>
+        <p><strong>Pin:</strong> {{ $device['pin'] }}</p>
+        <p><strong>Board:</strong> {{ $device['board'] }}</p>
+        <p>Manuelna kontrola : Ukoliko zelite manuelno da konfigurisete uredjaj, kliknite na <a href="http://192.168.4.1"></a></p>
         <hr>
     </div>
 </body>

@@ -69,6 +69,7 @@ class DeviceRepository implements RepositoryInterface
     }
     public function filterByColumns($filters, $operator="=")
     {
+
         return $this->model->where(function ($query) use ($filters,$operator) {
             foreach ($filters as $column => $value) {
                 if ($column && $value) {
@@ -76,10 +77,11 @@ class DeviceRepository implements RepositoryInterface
                         $value = "%".$value."%";
                     }
                     // dd($column,$operator,$value);
+//                    dd($column,$value);
                     $query->orWhere($column, $operator, $value);
                 }
             }
-        });
+        })->get();
     }
 
     public function filterByColumnsAndRelation($filters, $operator, $relation)

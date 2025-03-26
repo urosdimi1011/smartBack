@@ -16,10 +16,14 @@ class AuthController extends Controller
 
         if (!$token = Auth::guard('api')->attempt($credentials)) {
             // $token = $user->createToken('authToken')->plainTextToken;
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Pogresan email ili lozinka'], 404);
         }
 
+        $user = Auth::guard('api')->user();
 
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Morate verifikovati email pre prijave.'], 403);
+        }
         // Ako je login uspešan, generiši JWT token (ako koristiš Sanctum/Passport)
 
         return response()->json([
@@ -32,6 +36,13 @@ class AuthController extends Controller
 
     public function refreshToken()
     {
+        $user = auth()->user();
+
+        // Provera da li korisnik postoji
+        if (!$user) {
+            return response()->json(['message' => 'Korisnik nije pronađen'], 404);
+        }
+
         // dd("Uslii");
         return response()->json([
             'token' => auth()->refresh(),

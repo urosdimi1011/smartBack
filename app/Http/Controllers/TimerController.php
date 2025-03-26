@@ -6,6 +6,7 @@ use App\Http\Requests\TimerRequest;
 use App\Services\TimerService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class TimerController extends Controller
 {
@@ -28,15 +29,17 @@ class TimerController extends Controller
         //dohvatanje vremena
 
         $now = Carbon::now()->setTimezone("Europe/Belgrade");
+        Log::info('Trenutno vreme: ' . $now);
 
         //Za sat vremena mi kasni kasni nego na serveru
         // dd($now->toArray());
         $currentDay = strtolower($now->format('l')); //dohvatanje dana.
         $currentTime = $now->format('H:i');
         // dd($currentTime);
-
+        Log::info($currentDay ." - ". $currentTime);
         $actives = $this->timerService->getActiveTimer($currentDay, $currentTime);
         // dd($actives);
+        Log::info($actives);
 
         if ($actives->isEmpty()) {
             return response()->json(['message' => 'Nema aktivnih tajmera'], 200);
