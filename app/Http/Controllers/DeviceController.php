@@ -90,6 +90,14 @@ class DeviceController extends Controller
         try {
             $status = boolval($request->input('status'));
 
+            if ($request->isMethod('post')) {
+                $status = boolval($request->input('status'));
+            }
+            // Za GET metodu, koristimo query string
+            elseif ($request->isMethod('get')) {
+                $status = boolval($request->query('status'));
+            }
+
             //Ovo je mnogo glupo, promeni ovu metodu changeStatus!
             if($request->has('pin')){
                 $pin = $request->input('pin');

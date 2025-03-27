@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Route;
     Route::post('/email/resend', [VerificationController::class, 'resend']);
     // /api/device/status/53?status=1
     Route::middleware(['auth:api','verified'])->group(function(){
+        Route::patch('changePassword/{idUser}', [UserController::class, 'changePassword']);
+        Route::post('changePassword', [UserController::class, 'confirmPassword']);
         Route::post('device', [DeviceController::class, 'store']);
         Route::get('device', [DeviceController::class, 'getAll']);
         Route::get('groups', [GroupController::class, 'getAll']);
