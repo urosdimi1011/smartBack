@@ -34,21 +34,22 @@ class AuthController extends Controller
         // return response()->json(['token' => $token, 'user' => $user], 200);
     }
 
-    public function refreshToken()
+    public function refreshToken(Request $request)
     {
-        $user = auth()->user();
-
-        // Provera da li korisnik postoji
-        if (!$user) {
-            return response()->json(['message' => 'Korisnik nije pronađen'], 404);
+        try{
+            if (!$token = auth()->setToken($request->bearerToken())->refresh()) {
+                return response()->json(['message' => 'Neuspešno osvežavanje tokena'], 401);
+            }
+            return response()->json([
+                'token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
+        }
+        catch (\Exception $ex){
+            return response()->json(['message' => 'Nevažeći ili istekao token'], 401);
         }
 
-        // dd("Uslii");
-        return response()->json([
-            'token' => auth()->refresh(),
-            'token_type'   => 'bearer',
-            'expires_in'   => auth()->factory()->getTTL() * 60
-        ]);
     }
 
     public function logout()

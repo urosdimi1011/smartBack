@@ -31,7 +31,8 @@ class DeviceRequest extends FormRequest
             'ssid' => 'required',
             'wifiPassword' => 'required',
             'board'=>'nullable|numeric',
-            'pin'=>'nullable|numeric'
+            'pin'=>'nullable|numeric',
+            'hasBrightness'=>'nullable|numeric'
         ];
     }
     protected function failedValidation(Validator $validator){

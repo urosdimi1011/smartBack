@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Repositories\GroupRepository;
 use App\Services\OwnService;
+use Carbon\Carbon;
 
 class GroupService extends OwnService
 {
@@ -19,8 +20,9 @@ class GroupService extends OwnService
     {
         return $this->atributi->filterByColumnsAndRelation($filters, $operator,$relation,$relationFilters);
     }
-    public function changeStatusOfDeviceInGroup($id,$status){
+    public function changeStatusOfDeviceInGroup($id,$status,$ids){
         $group = $this->getById($id);
-        return $group->devices()->update(["status"=>$status]);
+        $time = Carbon::now()->setTimezone("Europe/Belgrade")->format("Y-m-d H:i:s");
+        return $group->devices()->whereIn('devices.id',$ids)->update(["status"=>$status,"updated_date"=>$time]);
     }
 }

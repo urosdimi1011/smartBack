@@ -67,36 +67,73 @@ class DeviceRepository implements RepositoryInterface
         $device->status = $status;
         return $device->save();
     }
-    public function filterByColumns($filters, $operator="=")
+    public function filterByColumns($filters, $operator="=",$operatorOfFilter="or")
     {
 
-        return $this->model->where(function ($query) use ($filters,$operator) {
+        return $this->model->where(function ($query) use ($filters,$operator,$operatorOfFilter) {
             foreach ($filters as $column => $value) {
                 if ($column && $value) {
                     if($operator == "like"){
                         $value = "%".$value."%";
                     }
-                    // dd($column,$operator,$value);
-//                    dd($column,$value);
-                    $query->orWhere($column, $operator, $value);
+                    if($operatorOfFilter == "or"){
+                        $query->orWhere($column, $operator, $value);
+                    }
+                    else if($operatorOfFilter == "and"){
+                        $query->where($column, $operator, $value);
+                    }
+                    else{
+                        $query->where($column, $operator, $value);
+                    }
                 }
             }
         })->get();
     }
 
-    public function filterByColumnsAndRelation($filters, $operator, $relation)
+    public function filterByColumnsAndRelation($filters, $operator, $relation,$operatorOfFilter="OR")
     {
-        $data= $this->model->where(function ($query) use ($filters, $operator) {
+        $data= $this->model->with($relation)->where(function ($query) use ($filters, $operator,$operatorOfFilter) {
             foreach ($filters as $column => $value) {
                 if ($column && $value) {
-                    if ($operator == "like") {
-                        $value = "%" . $value . "%";
+                    if (str_contains($column, '.')) {
+                        // Filtriramo po relaciji (npr. 'category.name')
+                        [$relationName, $relationColumn] = explode('.', $column);
+                        $query->whereHas($relationName, function ($q) use ($relationColumn, $value, $operator) {
+                            if ($operator === "like") {
+                                $q->where($relationColumn, 'like', "%{$value}%");
+                            } elseif ($operator === 'in') {
+                                $q->whereIn($relationColumn, [$value]);
+                            } elseif ($operator === 'not in') {
+                                $q->whereNotIn($relationColumn, [$value]);
+                            } else {
+                                $q->where($relationColumn, $operator, $value);
+                            }
+                        });
                     }
-                    $query->orWhere($column, $operator, $value);
+                    else{
+                        if($operator == "like"){
+                            $query->orWhere($column, 'like', "%{$value}%");
+                        }
+                        elseif ($operator == 'in') {
+                            //OVO OVDE PROMENI, ZA SAD JE OVAKO!
+                            if($column == 'id_user'){
+                                $query->whereIn($column, $value);
+                            }
+                            else{
+                                $query->orWhereIn($column, $value);
+                            }
+                        } elseif ($operator == 'not in') {
+                            $query->whereNotIn($column, $value);
+                        } elseif($operatorOfFilter == 'OR') {
+                            $query->orWhere($column, $operator, $value);
+                        }
+                        else{
+                            $query->where($column, $operator, $value);
+                        }
+                    }
                 }
             }
-        })->with($relation)->get();
-        // dd($data->all());
+        })->get();
         return $data;
     }
 }

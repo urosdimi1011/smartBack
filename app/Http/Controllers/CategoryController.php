@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\CategoryService;
-// use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -12,6 +11,12 @@ class CategoryController extends Controller
     ) {}
 
     public function getAll(){
+//        if($request->has('all')){
+//            $categories = $this->categoryService->getAll();
+//        }
+//        else{
+//            $categories = $this->categoryService->filterByColumns(['name'=>['Heating','Cooling']],'not in')->get();
+//        }
         $categories = $this->categoryService->getAll();
         return response()->json(["categories"=>$categories],200);
     }

@@ -68,9 +68,15 @@ class CategoryRepository implements RepositoryInterface
             foreach ($filters as $column => $value) {
                 if ($column && $value) {
                     if($operator == "like"){
-                        $value = "%".$value."%";
+                        $query->orWhere($column, 'like', "%{$value}%");
                     }
-                    $query->orWhere($column, $operator, $value);
+                    elseif ($operator == 'in') {
+                        $query->orWhereIn($column, $value);
+                    } elseif ($operator == 'not in') {
+                        $query->whereNotIn($column, $value);
+                    } else {
+                        $query->orWhere($column, $operator, $value);
+                    }
                 }
             }
         });

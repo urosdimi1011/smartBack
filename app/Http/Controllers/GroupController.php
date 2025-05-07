@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GroupNameRequest;
 use App\Http\Requests\GroupRequest;
 use App\Services\GroupService;
 use App\Traits\DeviceStautsTrait;
@@ -78,6 +79,18 @@ class GroupController extends Controller
             return response()->json(["message" => 'Uspesno ste obrisali kategoriju'], 204);
         } catch (Error $ex) {
             return response()->json(["message" => $ex->getMessage()], $ex->getCode());
+        }
+    }
+    public function changeGroupName($id,GroupNameRequest $request){
+        try{
+            $group = $this->groupService->getById($id);
+            if($group){
+                $this->groupService->update($id,['name'=>$request->input('name')]);
+            }
+            return response()->json([],204);
+        }
+        catch(\Exception $ex){
+            return response()->json(["message"=>$ex->getMessage()],$ex->getCode());
         }
     }
 }

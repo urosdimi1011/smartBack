@@ -45,7 +45,7 @@ class TimerService extends OwnService
     public function changeTimer($data,$id){
         try {
             DB::beginTransaction();
-            $date = Carbon::parse($data['time'])->setTimezone('Europe/Belgrade');
+            $date = Carbon::parse($data['time'], 'Europe/Belgrade');
             $dateTime =  $date->format('H:i');
                 $dataMy = [
                     "name" => $data['name'],

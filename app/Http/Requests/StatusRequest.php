@@ -25,7 +25,8 @@ class StatusRequest extends FormRequest
     {
         return [
             "status"=>'required|boolean',
-            'pin'=>'string'
+            'pin'=>'string',
+            'ids'=>'nullable|exists:devices,id'
         ];
     }
 }

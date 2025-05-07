@@ -81,42 +81,53 @@ class TermostatRepository implements RepositoryInterface
             }
         })->get();
     }
-    public function filterByColumnsAndRelation($filters, $operator, $relation, $relationFilters = [])
+    public function filterByColumnsAndRelation($filters, $operator, $relation,$operatorOfFilter="OR")
     {
-        //Ovo ovde cu sad da napravim samo za jednu relaciju i filtriranje u njoj, 
-        //sto znaci da ovo mora da se resi kad bude bilo vise relacija i izmedju 
-        //razlicitih tabela neka filtriranja
-        // dd($relation);
-        // $data = $this->model->where(function ($query) use ($filters, $operator) {
-        //     foreach ($filters as $column => $value) {
-        //         if ($column && $value) {
-        //             if ($operator == "like") {
-        //                 $value = "%" . $value . "%";
-        //             }
+        $data = $this->model->with($relation)->where(function ($query) use ($filters, $operator, $operatorOfFilter) {
+            foreach ($filters as $column => $value) {
+                if ($column && $value) {
+                    if (str_contains($column, '.')) {
+                        [$relationName, $relationColumn] = explode('.', $column, 2);
 
-        //             if (str_contains($column, '.')) {
-        //                 [$rel, $col] = explode('.', $column);
-        //                 $query->whereHas($rel, function ($q) use ($col, $operator, $value) {
-        //                     $q->where($col, $operator, (int)$value);
-        //                 });
-        //             } else {
-        //                 $query->orWhere($column, $operator, $value);
-        //             }
-        //         }
-        //     }
-        // })->with([
-        //     $relation => function ($query) use ($relationFilters) {
-        //         // dd($relationFilters);
-        //         foreach ($relationFilters as $column => $value) {
-        //             // dd($column);
-        //             if ($column && $value) {
-        //                 $query->where($column, $value);
-        //             }
-        //         }
-        //         // $query->with('category'); 
-        //     },
-        //     'devices.category'
-        // ])->get();
-        // return $data;
+                        // Detekcija za pivot
+                        if (str_starts_with($relationColumn, 'pivot.')) {
+                            $pivotColumn = explode('.', $relationColumn)[1];
+                            $pivotTable = $this->model->{$relationName}()->getTable();
+                            $query->whereHas($relationName, function ($q) use ($pivotTable,$pivotColumn, $value, $operator) {
+                                $q->where($pivotTable . '.' . $pivotColumn, $operator, $value);
+                            });
+                        } else {
+                            // Klasična relacija
+                            $query->whereHas($relationName, function ($q) use ($relationColumn, $value, $operator) {
+                                if ($operator === "like") {
+                                    $q->where($relationColumn, 'like', "%{$value}%");
+                                } elseif ($operator === 'in') {
+                                    $q->whereIn($relationColumn, [$value]);
+                                } elseif ($operator === 'not in') {
+                                    $q->whereNotIn($relationColumn, [$value]);
+                                } else {
+                                    $q->where($relationColumn, $operator, $value);
+                                }
+                            });
+                        }
+                    } else {
+                        // Filtriranje po glavnoj tabeli
+                        if ($operator == "like") {
+                            $query->orWhere($column, 'like', "%{$value}%");
+                        } elseif ($operator == 'in') {
+                            $query->orWhereIn($column, $value);
+                        } elseif ($operator == 'not in') {
+                            $query->whereNotIn($column, $value);
+                        } elseif ($operatorOfFilter == 'OR') {
+                            $query->orWhere($column, $operator, $value);
+                        } else {
+                            $query->where($column, $operator, $value);
+                        }
+                    }
+                }
+            }
+        });
+
+        return $data;
     }
 }
